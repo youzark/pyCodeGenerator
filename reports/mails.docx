@@ -1,0 +1,5 @@
+
+感谢老师的提醒，论文初稿这两天就会给您提交上去
+我最主要的问题是：
+我尝试了GPT2框架下的不同参数大小，对初始source codes也进行了不少优化，包括但不限于（parse to get rid of invalid code and rearrange the code sequence to fit code snippets better in token length limit ，refactor，filter through non ascii code，reformat）但是只有最简单的几个情况可以跑出模型，只能做到简单的学习语法，限于1024 tokens（a lot of identifiers and doc strings confuse my BPE tokenizer to add a lot of meaningless tokens,and I have no idea how to rename the identifiers while preserve it's meaning. I do have delete some comments and doc strings in parsing)， 以及 模型大小，感觉模型很难捕捉到算法层面的信息。我曾试过加一个global memory ， 存储过往的（key，query，value）pairs， 但是没有做到
+
