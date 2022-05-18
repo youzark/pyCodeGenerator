@@ -4,8 +4,14 @@ from transformers import GPT2Config, GPT2Tokenizer
 from transformers import DataCollatorForLanguageModeling
 from datasets import load_dataset
 from transformers import Trainer,TrainingArguments
-from transformers import AutoModel
+from transformers import AutoModelForPreTraining,GPT2LMHeadModel
+
 ##
+
+modelName = "PyGenSmall"
+dataSetName = "./codeBaseSmall.txt"
+modleDir = modelName
+modleLogDir = modleDir + "Log"
 
 def loadGPT2Tokenizer():
     tokenizer = GPT2Tokenizer.from_pretrained("./tokenizer")
@@ -25,9 +31,10 @@ config = GPT2Config(
         eos_token = tokenizer.eos_token_id
         )
 
-model = AutoModel.from_pretrained(pretrained_model_name_or_path = "./PyGen/",config = config)
+# model = AutoModelForPreTraining.from_pretrained(pretrained_model_name_or_path = "PyGenNew/checkpoint-144000",config = config)
+model = GPT2LMHeadModel(config)
 
-paths = ["./pythonCodeBase.txt"]
+paths = [dataSetName]
 dataset = load_dataset("text",data_files=paths)
 
 def encode(lines):
@@ -44,10 +51,14 @@ dataCollator = DataCollatorForLanguageModeling(
         mlm_probability=0.15)
 
 trainingArgs = TrainingArguments(
-        output_dir= "PyGen",
+        output_dir= modleDir,
+        logging_strategy="steps",
+        logging_steps=100,
+        logging_dir=modleLogDir,
+        report_to="tensorboard",
         overwrite_output_dir=True,
-        num_train_epochs=1,
-        per_device_train_batch_size=8,
+        num_train_epochs=8,
+        per_device_train_batch_size=3,
         save_steps=2_000,
         save_total_limit=2,
         prediction_loss_only=True,
@@ -61,5 +72,7 @@ trainer = Trainer(
         train_dataset = dataset,
         )
 
+# trainer.train("./PyGenNew/checkpoint-144000")
 trainer.train()
-trainer.save_model("./PyGen")
+trainer.save_model(modleDir)
+
