@@ -15,7 +15,7 @@ class Generator:
         """
         estimateTokensPerLine = 30
         context = self.getContextGivenTokenLimit(400)
-        maxLength = max(1024,500 + lineNum * estimateTokensPerLine)
+        maxLength = min(1024,self._model.countTokens(context) + lineNum * estimateTokensPerLine)
         generatedCodeSnippet = self._model.generateCodeSnippet(context=context,maxLength=maxLength)
         generatedLines = generatedCodeSnippet.splitlines(keepends=True)
         if len(generatedCodeSnippet) <= lineNum:
@@ -28,7 +28,7 @@ class Generator:
         context = ""
         for line in lineGen:
             context = line + context
-            tokens += self._model.decode(line)
+            tokens += self._model.countTokens(line)
             if tokens > tokenLimit:
                 return context
         return context

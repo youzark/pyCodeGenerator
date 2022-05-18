@@ -4,9 +4,9 @@ from transformers import GPT2LMHeadModel
 
 class Model:
     def __init__(self,tokenizerDir : str,modelDir : str,device = "cuda"):
+        self._device = device
         self.tokenizer = self._loadGPT2Tokenizer(tokenizerDir)
         self.model = self._loadGPT2Model(modelDir)
-        self._device = device
 
     def _loadGPT2Tokenizer(self,tokenizerDir):
         tokenizer = GPT2Tokenizer.from_pretrained(tokenizerDir)
@@ -30,7 +30,7 @@ class Model:
         return codeSnippet.replace("\n","<N>")
 
     def generateCodeSnippet(self,context,maxLength,beams = 3,temperature = 0.7) -> str:
-        inputIDs = self.encode(self._encodeNewLine(context))
+        inputIDs = self.encode(context)
         modelOutput = self.model.generate(
                 inputIDs,
                 max_length = maxLength,
@@ -39,10 +39,16 @@ class Model:
                 no_repeat_ngram_size = 5,
                 num_return_sequences = 1
                 )
-        return self._decodeNewLine(self.decode(modelOutput[0]))
+        return self.decode(modelOutput[0])[len(context):]
 
     def encode(self,codeSnippet : str):
-        return self.tokenizer.encode(codeSnippet,return_tensors="pt").to(self._device)
+        return self.tokenizer.encode(self._encodeNewLine(codeSnippet),return_tensors="pt").to(self._device)
 
     def decode(self,tokens):
-        return self.tokenizer.decode(tokens)
+        return self._decodeNewLine(self.tokenizer.decode(tokens))
+
+    def countTokens(self,codeSnippet : str) -> int:
+        """
+        encode and count tokens of codeSnippet
+        """
+        return len(self.tokenizer.encode(self._encodeNewLine(codeSnippet)))
