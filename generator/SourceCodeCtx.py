@@ -14,6 +14,10 @@ class SourceCodeCtx():
         self._source = "".join(self._lines)
         self.lineCount = len(self._lines)
 
+    def recreateCtx(self,newSourcode : str):
+        self._source = newSourcode
+        self._parse()
+
     def getLastLines(self,lineCount : int) -> list[str]:
         """
         return last {lineCount} lines in the context,if the last line is not finished with "\n" , it will still count as a single line as long as it's not empty.
