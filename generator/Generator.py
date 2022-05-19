@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-from .SourceCodeCtx import SourceCodeCtx
-from .Model import Model
+from SourceCodeCtx import SourceCodeCtx
+from Model import Model
 
 class Generator:
     def __init__(self,model : Model,sourceCodeCtx : SourceCodeCtx):
